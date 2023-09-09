@@ -46,13 +46,13 @@ func (sub *Subscription[T]) handleSubscription(client client[T]) {
 	if status == Connected {
 		_, err := sub.subscribe(client)
 		if err != nil {
-			log.Printf(err.Error())
+			log.Println(err.Error())
 		}
 	}
 	if status == Disconnected {
 		err := sub.unsubscribe(client.ID)
 		if err != nil {
-			log.Printf(err.Error())
+			log.Println(err.Error())
 		}
 	}
 }

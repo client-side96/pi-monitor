@@ -72,19 +72,17 @@ func writeWsMessages(
 	}()
 
 	for {
-		select {
-		case s := <-client.Channel:
-			data, err := json.Marshal(&s)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			err = conn.WriteMessage(1, data)
-			if err != nil {
-				log.Printf("WS ERROR: %s", err)
-				return
-			}
-
+		s := <-client.Channel
+		data, err := json.Marshal(&s)
+		if err != nil {
+			log.Println(err)
+			return
 		}
+		err = conn.WriteMessage(1, data)
+		if err != nil {
+			log.Printf("WS ERROR: %s", err)
+			return
+		}
+
 	}
 }

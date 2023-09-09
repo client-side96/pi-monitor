@@ -47,7 +47,10 @@ func TestHandler_Stats_ConnectStatsWS_StatsFromChannel(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-	json.Unmarshal(bytes, &result)
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 
 	if result.Temperature != stats.Temperature {
 		t.Errorf("Expected %f but got %f", stats.Temperature, result.Temperature)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
 	"time"
 
@@ -74,5 +75,8 @@ func main() {
 		Handler: router.SetupRoutes(),
 	}
 
-	httpServer.ListenAndServe()
+	err := httpServer.ListenAndServe()
+	if err != nil {
+		log.Fatalf("Server error: %v", err)
+	}
 }

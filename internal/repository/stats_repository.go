@@ -12,10 +12,10 @@ type IStatsRepository interface {
 }
 
 type StatsRepository struct {
-	os os.OSCommunicator
+	os os.Communicator
 }
 
-func NewStatsRepository(os os.OSCommunicator) *StatsRepository {
+func NewStatsRepository(os os.Communicator) *StatsRepository {
 	return &StatsRepository{
 		os: os,
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/client-side96/pi-monitor/internal/config"
 )
 
-type OSCommunicator interface {
+type Communicator interface {
 	ExecuteScript(script string) string
 }
 

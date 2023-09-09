@@ -18,8 +18,8 @@ func (m *MockStatsService) Connect() sub.StatsClient {
 	return m.Client
 }
 
-func (m *MockStatsService) Disconnect(client sub.StatsClient) {}
+func (m *MockStatsService) Disconnect(_ sub.StatsClient) {}
 
-func (m *MockStatsService) HandleStatsSubscripition(client sub.StatsClient) {}
+func (m *MockStatsService) HandleStatsSubscripition(_ sub.StatsClient) {}
 
 func (m *MockStatsService) PublishToAllClients() {}

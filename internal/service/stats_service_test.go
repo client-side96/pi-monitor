@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"testing"
@@ -19,7 +19,7 @@ var cpu = 22.22
 var mem = 15.24
 
 func TestMain(m *testing.M) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 	os.Exit(m.Run())
 }
 
@@ -53,14 +53,12 @@ func TestService_Stats_Connect_SingleConnection(t *testing.T) {
 
 	go s.Connect()
 
-	select {
-	case result = <-s.Channel:
-		if result.ID != 1 {
-			t.Errorf("Expected 1 but got %d", result.ID)
-		}
-		if result.Status != sub.Connected {
-			t.Errorf("Expected to be connected but got %s", result.Status)
-		}
+	result = <-s.Channel
+	if result.ID != 1 {
+		t.Errorf("Expected 1 but got %d", result.ID)
+	}
+	if result.Status != sub.Connected {
+		t.Errorf("Expected to be connected but got %s", result.Status)
 	}
 
 }
@@ -76,16 +74,14 @@ func TestService_Stats_Connect_MultipleConnections(t *testing.T) {
 	go s.Connect()
 
 	for connectionCount < 3 {
-		select {
-		case result = <-s.Channel:
-			if result.ID != connectionCount {
-				t.Errorf("Expected %d but got %d", connectionCount, result.ID)
-			}
-			if result.Status != sub.Connected {
-				t.Errorf("Expected to be Connected but got %s", result.Status)
-			}
-			connectionCount++
+		result = <-s.Channel
+		if result.ID != connectionCount {
+			t.Errorf("Expected %d but got %d", connectionCount, result.ID)
 		}
+		if result.Status != sub.Connected {
+			t.Errorf("Expected to be Connected but got %s", result.Status)
+		}
+		connectionCount++
 	}
 
 }
@@ -108,15 +104,13 @@ func TestService_Stats_Disconnect_SingleConnection(t *testing.T) {
 	}()
 
 	for count < 2 {
-		select {
-		case result = <-s.Channel:
-			if count == 0 {
-				go func() {
-					s.Disconnect(client)
-				}()
-			}
-			count++
+		result = <-s.Channel
+		if count == 0 {
+			go func() {
+				s.Disconnect(client)
+			}()
 		}
+		count++
 	}
 
 	if result.Status != sub.Disconnected {
@@ -142,9 +136,7 @@ func TestService_Stats_PublishToAllClients(t *testing.T) {
 
 	go s.PublishToAllClients()
 
-	select {
-	case result = <-client.Channel:
-	}
+	result = <-client.Channel
 
 	if result.Temperature != temp {
 		t.Errorf("Expected %f but got %f", temp, result.Temperature)
