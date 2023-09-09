@@ -5,16 +5,19 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/client-side96/pi-monitor/internal/api"
+	"github.com/client-side96/pi-monitor/internal/api/handlers"
 	"github.com/client-side96/pi-monitor/internal/config"
 	"github.com/client-side96/pi-monitor/internal/os"
-	"github.com/client-side96/pi-monitor/internal/stats"
-	"github.com/client-side96/pi-monitor/internal/web"
+	"github.com/client-side96/pi-monitor/internal/repository"
+	"github.com/client-side96/pi-monitor/internal/service"
+	"github.com/client-side96/pi-monitor/internal/sub"
 )
 
 var scriptDir string
 var addr string
 
-func mainLoop(statsService *stats.StatsService) {
+func mainLoop(statsService *service.StatsService) {
 	ticker := time.NewTicker(1 * time.Second)
 
 	defer func() {
@@ -24,9 +27,9 @@ func mainLoop(statsService *stats.StatsService) {
 	for {
 		select {
 		case client := <-statsService.Channel:
-			statsService.HandleClientSubscription(client)
+			statsService.HandleStatsSubscripition(client)
 		default:
-			statsService.PublishStats()
+			statsService.PublishToAllClients()
 
 		}
 	}
@@ -53,14 +56,22 @@ func main() {
 	}
 
 	linuxCommunicator := os.NewLinuxCommunicator(env)
-	statsService := stats.NewStatsService(linuxCommunicator)
+
+	statsRepo := repository.NewStatsRepository(linuxCommunicator)
+
+	statsSub := sub.NewStatsSubscription()
+
+	statsService := service.NewStatsService(statsSub, statsRepo)
+
+	statsHandler := handlers.NewStatsHandler(statsService)
+
+	router := api.NewRouter(statsHandler)
 
 	go mainLoop(statsService)
 
-	server := web.NewServer(statsService)
 	httpServer := &http.Server{
 		Addr:    env.Addr,
-		Handler: server.GetRoutes(),
+		Handler: router.SetupRoutes(),
 	}
 
 	httpServer.ListenAndServe()

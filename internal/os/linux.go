@@ -7,6 +7,10 @@ import (
 	"github.com/client-side96/pi-monitor/internal/config"
 )
 
+type OSCommunicator interface {
+	ExecuteScript(script string) string
+}
+
 type LinuxCommunicator struct {
 	env config.Environment
 }

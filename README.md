@@ -19,3 +19,11 @@ make image
 # Start the container
 make start
 ```
+
+### Unit testing
+
+Component tests can be run with:
+
+```sh
+make test
+```

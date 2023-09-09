@@ -6,7 +6,7 @@ RUN mkdir -p ./scripts
 
 COPY ./bin/pi-monitor .
 COPY ./scripts/* ./scripts/
-COPY ./mocks/vcgencmd /usr/bin/vcgencmd
+COPY ./scripts/mocks/vcgencmd /usr/bin/vcgencmd
 
 RUN chmod +x ./scripts/*.sh
 RUN usermod -aG video root
