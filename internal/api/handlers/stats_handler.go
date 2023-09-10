@@ -7,6 +7,7 @@ import (
 
 	"github.com/client-side96/pi-monitor/internal/service"
 	"github.com/client-side96/pi-monitor/internal/sub"
+	"github.com/client-side96/pi-monitor/internal/util"
 	"github.com/gorilla/websocket"
 )
 
@@ -32,57 +33,26 @@ func (h *StatsHandler) ConnectStatsWS(w http.ResponseWriter, r *http.Request) {
 	}
 	ws, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.Println(util.ErrWSUpgrade)
 	}
 
 	client := h.statsService.Connect()
 
-	go writeWsMessages(ws, h.statsService, client)
+	defer cleanupConnection(ws, h.statsService, client)
 
-	readWsMessages(ws, h.statsService, client)
+	go util.WriteWS(ws, func() ([]byte, error) {
+		return readStatsChannel(client)
+	})
+
+	util.ReadWS(ws)
 }
 
-func readWsMessages(
-	conn *websocket.Conn,
-	statsService service.IStatsService,
-	client sub.StatsClient,
-) {
-	defer func() {
-		statsService.Disconnect(client)
-		conn.Close()
-	}()
-	for {
-		_, _, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
+func readStatsChannel(client sub.StatsClient) ([]byte, error) {
+	s := <-client.Channel
+	return json.Marshal(&s)
 }
 
-func writeWsMessages(
-	conn *websocket.Conn,
-	statsService service.IStatsService,
-	client sub.StatsClient,
-) {
-
-	defer func() {
-		statsService.Disconnect(client)
-		conn.Close()
-	}()
-
-	for {
-		s := <-client.Channel
-		data, err := json.Marshal(&s)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		err = conn.WriteMessage(1, data)
-		if err != nil {
-			log.Printf("WS ERROR: %s", err)
-			return
-		}
-
-	}
+func cleanupConnection(c *websocket.Conn, s service.IStatsService, cl sub.StatsClient) {
+	s.Disconnect(cl)
+	c.Close()
 }

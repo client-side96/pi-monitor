@@ -6,10 +6,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/client-side96/pi-monitor/internal/mocks"
 	"github.com/client-side96/pi-monitor/internal/model"
 	"github.com/client-side96/pi-monitor/internal/service"
 	"github.com/client-side96/pi-monitor/internal/sub"
+	"github.com/client-side96/pi-monitor/internal/testutil"
+	"github.com/client-side96/pi-monitor/internal/testutil/mocks"
 )
 
 var subscription *sub.StatsSubscription
@@ -34,15 +35,9 @@ func TestService_Stats_GetStats(t *testing.T) {
 
 	result := s.GetStats()
 
-	if result.Temperature != temp {
-		t.Errorf("Expected %f but got %f", temp, result.Temperature)
-	}
-	if result.CPULoad != cpu {
-		t.Errorf("Expected %f but got %f", cpu, result.CPULoad)
-	}
-	if result.MemoryUsage != mem {
-		t.Errorf("Expected %f but got %f", mem, result.MemoryUsage)
-	}
+	testutil.AssertEqual(t, result.Temperature, temp)
+	testutil.AssertEqual(t, result.CPULoad, cpu)
+	testutil.AssertEqual(t, result.MemoryUsage, mem)
 }
 
 func TestService_Stats_Connect_SingleConnection(t *testing.T) {
@@ -54,12 +49,9 @@ func TestService_Stats_Connect_SingleConnection(t *testing.T) {
 	go s.Connect()
 
 	result = <-s.Channel
-	if result.ID != 1 {
-		t.Errorf("Expected 1 but got %d", result.ID)
-	}
-	if result.Status != sub.Connected {
-		t.Errorf("Expected to be connected but got %s", result.Status)
-	}
+
+	testutil.AssertEqual(t, 1, result.ID)
+	testutil.AssertEqual(t, sub.Connected, result.Status)
 
 }
 
@@ -75,12 +67,10 @@ func TestService_Stats_Connect_MultipleConnections(t *testing.T) {
 
 	for connectionCount < 3 {
 		result = <-s.Channel
-		if result.ID != connectionCount {
-			t.Errorf("Expected %d but got %d", connectionCount, result.ID)
-		}
-		if result.Status != sub.Connected {
-			t.Errorf("Expected to be Connected but got %s", result.Status)
-		}
+
+		testutil.AssertEqual(t, connectionCount, result.ID)
+		testutil.AssertEqual(t, sub.Connected, result.Status)
+
 		connectionCount++
 	}
 
@@ -113,9 +103,7 @@ func TestService_Stats_Disconnect_SingleConnection(t *testing.T) {
 		count++
 	}
 
-	if result.Status != sub.Disconnected {
-		t.Errorf("Expected to be Disconnected but got %s", result.Status)
-	}
+	testutil.AssertEqual(t, sub.Disconnected, result.Status)
 }
 
 func TestService_Stats_PublishToAllClients(t *testing.T) {
@@ -138,13 +126,7 @@ func TestService_Stats_PublishToAllClients(t *testing.T) {
 
 	result = <-client.Channel
 
-	if result.Temperature != temp {
-		t.Errorf("Expected %f but got %f", temp, result.Temperature)
-	}
-	if result.CPULoad != cpu {
-		t.Errorf("Expected %f but got %f", cpu, result.CPULoad)
-	}
-	if result.MemoryUsage != mem {
-		t.Errorf("Expected %f but got %f", mem, result.MemoryUsage)
-	}
+	testutil.AssertEqual(t, result.Temperature, temp)
+	testutil.AssertEqual(t, result.CPULoad, cpu)
+	testutil.AssertEqual(t, result.MemoryUsage, mem)
 }

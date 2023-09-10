@@ -3,8 +3,9 @@ package repository_test
 import (
 	"testing"
 
-	"github.com/client-side96/pi-monitor/internal/mocks"
 	"github.com/client-side96/pi-monitor/internal/repository"
+	"github.com/client-side96/pi-monitor/internal/testutil"
+	"github.com/client-side96/pi-monitor/internal/testutil/mocks"
 )
 
 func TestRepository_Stats_ExecuteTemperatureScript(t *testing.T) {
@@ -12,31 +13,25 @@ func TestRepository_Stats_ExecuteTemperatureScript(t *testing.T) {
 		Result: "20.14",
 	}
 	repo := repository.NewStatsRepository(mockOs)
-	temp := repo.ExecuteTemperatureScript()
+	result := repo.ExecuteTemperatureScript()
 
-	if temp != 20.14 {
-		t.Errorf("Expected 20.14 but got %f", temp)
-	}
+	testutil.AssertEqual(t, 20.14, result)
 }
 func TestRepository_Stats_ExecuteCPUScript(t *testing.T) {
 	mockOs := &mocks.MockCommunicator{
 		Result: "10.01",
 	}
 	repo := repository.NewStatsRepository(mockOs)
-	temp := repo.ExecuteCPUScript()
+	result := repo.ExecuteCPUScript()
 
-	if temp != 10.01 {
-		t.Errorf("Expected 10.01 but got %f", temp)
-	}
+	testutil.AssertEqual(t, 10.01, result)
 }
 func TestRepository_Stats_ExecuteMemoryScript(t *testing.T) {
 	mockOs := &mocks.MockCommunicator{
 		Result: "25.0",
 	}
 	repo := repository.NewStatsRepository(mockOs)
-	temp := repo.ExecuteMemoryScript()
+	result := repo.ExecuteMemoryScript()
 
-	if temp != 25.0 {
-		t.Errorf("Expected 20.14 but got %f", temp)
-	}
+	testutil.AssertEqual(t, 25.0, result)
 }

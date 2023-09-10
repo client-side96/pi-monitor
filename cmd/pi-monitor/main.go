@@ -56,14 +56,19 @@ func main() {
 		Addr:      addr,
 	}
 
+	// Low level
 	linuxCommunicator := os.NewLinuxCommunicator(env)
 
+	// Repositories
 	statsRepo := repository.NewStatsRepository(linuxCommunicator)
 
+	// Subscriptions
 	statsSub := sub.NewStatsSubscription()
 
+	// Services
 	statsService := service.NewStatsService(statsSub, statsRepo)
 
+	// Handlers
 	statsHandler := handlers.NewStatsHandler(statsService)
 
 	router := api.NewRouter(statsHandler)
