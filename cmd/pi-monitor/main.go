@@ -46,7 +46,7 @@ func main() {
 	flag.StringVar(
 		&addr,
 		"address",
-		":4000",
+		":8000",
 		"Port the webserver runs on",
 	)
 	flag.Parse()

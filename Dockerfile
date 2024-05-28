@@ -11,6 +11,6 @@ COPY ./scripts/mocks/vcgencmd /usr/bin/vcgencmd
 RUN chmod +x ./scripts/*.sh
 RUN usermod -aG video root
 
-EXPOSE 4000
+EXPOSE 8000
 
 CMD ["./pi-monitor", "-script-dir=/service/scripts/"]
