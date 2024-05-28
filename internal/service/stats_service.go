@@ -40,9 +40,10 @@ func (s *StatsService) GetStats() *model.StatsModel {
 
 func (s *StatsService) Connect() sub.StatsClient {
 	log.Println("Establishing connection...")
-	s.sub.SetLatestClientID(s.sub.GetLatestClientID() + 1)
+	newClientId := s.sub.GetLatestClientID() + 1
+	s.sub.SetLatestClientID(newClientId)
 	newClient := sub.StatsClient{
-		ID:      s.sub.GetLatestClientID(),
+		ID:      newClientId,
 		Channel: make(chan *model.StatsModel),
 		Status:  sub.Connected,
 	}
