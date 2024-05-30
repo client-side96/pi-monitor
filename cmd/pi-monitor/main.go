@@ -19,21 +19,28 @@ var scriptDir string
 var addr string
 
 func mainLoop(statsService *service.StatsService) {
+
 	ticker := time.NewTicker(1 * time.Second)
+	done := make(chan bool)
 
 	defer func() {
 		ticker.Stop()
+		done <- true
 	}()
 
 	for {
 		select {
+		case <-done:
+			return
+		case <-ticker.C:
+			statsService.PublishToAllClients()
 		case client := <-statsService.Channel:
 			statsService.HandleStatsSubscripition(client)
-		default:
-			statsService.PublishToAllClients()
+			// default:
 
 		}
 	}
+
 }
 
 func main() {
