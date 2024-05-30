@@ -18,6 +18,6 @@ func NewRouter(statsHandler handlers.IStatsHandler) *Router {
 
 func (r *Router) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/stats", r.statsHandler.ConnectStatsWS)
+	mux.HandleFunc("/monitor/api/stats", r.statsHandler.ConnectStatsWS)
 	return mux
 }
