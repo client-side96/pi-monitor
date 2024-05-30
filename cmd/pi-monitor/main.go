@@ -40,7 +40,7 @@ func main() {
 	flag.StringVar(
 		&scriptDir,
 		"script-dir",
-		"/home/admin/scripts/",
+		"/srv/pi-monitor/scripts/",
 		"Directory to store bash scripts",
 	)
 	flag.StringVar(
