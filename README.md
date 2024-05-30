@@ -27,3 +27,40 @@ Component tests can be run with:
 ```sh
 make test
 ```
+
+## Installation
+
+There are several ways to install the `pi-monitor` onto your Raspberry PI.
+I recommend using `systemd` service and use the raw binary as the bash scripts
+need to access the bare kernel. Installation via docker is supported, but 
+OS functionality needs to be mapped into the container.
+
+### Service (recommended)
+
+1. Create a new service unit file
+
+```
+  sudo vim /lib/systemd/system/pi-monitor.service
+```
+
+2. Paste the following in the newly created file
+```
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=<location of pi-monitor binary> -script-dir=<location of scripts>
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. Enable and start the service
+
+```
+  sudo systemctl enable pi-monitor.service
+  sudo systemctl start pi-monitor.service
+```
+
+> The service runs (unless configured otherwise) on port 8000 and can be accessed
+> by adding a reverse proxy on your web server of choice (Nginx, Caddy, Apache).
