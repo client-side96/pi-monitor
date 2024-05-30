@@ -17,10 +17,11 @@ import (
 
 var scriptDir string
 var addr string
+var publishInterval int
 
-func mainLoop(statsService *service.StatsService) {
+func mainLoop(env config.Environment, statsService *service.StatsService) {
 
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(time.Duration(env.PublishInterval) * time.Second)
 	done := make(chan bool)
 
 	defer func() {
@@ -36,8 +37,6 @@ func mainLoop(statsService *service.StatsService) {
 			statsService.PublishToAllClients()
 		case client := <-statsService.Channel:
 			statsService.HandleStatsSubscripition(client)
-			// default:
-
 		}
 	}
 
@@ -56,11 +55,18 @@ func main() {
 		":8000",
 		"Port the webserver runs on",
 	)
+	flag.IntVar(
+		&publishInterval,
+		"publish-interval",
+		1,
+		"Interval in seconds in which the statistics are published to clients",
+	)
 	flag.Parse()
 
 	env := config.Environment{
-		ScriptDir: scriptDir,
-		Addr:      addr,
+		ScriptDir:       scriptDir,
+		Addr:            addr,
+		PublishInterval: publishInterval,
 	}
 
 	// Low level
@@ -80,7 +86,7 @@ func main() {
 
 	router := api.NewRouter(statsHandler)
 
-	go mainLoop(statsService)
+	go mainLoop(env, statsService)
 
 	httpServer := &http.Server{
 		Addr:    env.Addr,
